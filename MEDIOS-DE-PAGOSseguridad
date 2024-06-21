@@ -1,0 +1,63 @@
+//crear una cuenta en Stripe 
+// añadir SDK fronted
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stripe Payment Integration</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        /* Simple CSS for form styling */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .stripe-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Stripe Payment Integration</h2>
+        <form id="payment-form">
+            <div id="card-element"></div>
+            <button id="submit" class="stripe-button">Pay</button>
+        </form>
+        <div id="payment-result"></div>
+    </div>
+
+    <script>
+        const stripe = Stripe('your-publishable-key'); // Replace with your Stripe publishable key
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        card.mount('#card-element');
+
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+            });
+
+            if (error) {
+                document.getElementById('payment-result').textContent = error.message;
+            } else {
+                // Send paymentMethod.id to your server
+                const response = await fetch('/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentMethodId: paymentMethod.id })
+                });
+
+                const result = await response.json();
+                if (result.error) {
+                    document.getElementById('payment-result').textContent = result.error.message;
+                } else {
+                    document.getElementById('payment-result').textContent = 'Payment successful!';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
