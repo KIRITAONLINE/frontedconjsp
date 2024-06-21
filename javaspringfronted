@@ -1,0 +1,17 @@
+package com.indexfronted;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class MySpringBootApp {
+
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(MySpringBootApp.class, args);
+    }
+}
