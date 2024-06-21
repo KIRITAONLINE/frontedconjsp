@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Bootstrapv5.0-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+  <!---Style Css-->
+   <link rel="stylesheet" href="assets/style.css/css.css">
+  <style>
+body {
+  
+  color: aliceblue;
+  margin: 0;
+  padding: 20px;
+  background-image:url(Img/fotografia1.jpg);
+}
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  background-image:url(img/fondomov2.gif);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 10%);
+}
+h1, h2 {
+  text-align: center;
+}
+.balance {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.input-group {
+  margin-bottom: 15px;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+.input-group input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+  </style>
+
+  </head>
+<body> 
+  <center>
+  <div class="container">
+        <title>Billetera Digital</title>
+        <div class="balance">
+            <h2 id="saldo">Saldo Actual: $0.</h2>
+        </div>
+        <div class="input-group">
+          <i class="icon-color_balance"></i><center><label for="monto">Monto:</label></center>
+            <i class="ri-font-color"></i><center><input type="number" id="monto" placeholder="Ingrese el monto"></center>
+        </div>
+        <button class="btn" onclick="agregarSaldo()">Agregar Saldo</button>
+        <button class="btn" onclick="retirarSaldo()">Retirar Saldo</button>
+    </div>
+  </div>
+</style>
+</center>
+</body>
+    <script>
+        let saldo = 500000;
+
+        function actualizarSaldo() {
+            document.getElementById('saldo').innerText = `Saldo Actual: $${saldo.toFixed(2)}`;
+        }
+
+        function agregarSaldo() {
+            let monto = parseFloat(document.getElementById('monto').value);
+            if (!isNaN(monto) && monto > 0) {
+                saldo += monto;
+                actualizarSaldo();
+                document.getElementById('monto').value = '';
+            } else {
+                alert("Ingrese un monto válido.");
+            }
+        }
+
+        function retirarSaldo() {
+            let monto = parseFloat(document.getElementById('monto').value);
+            if (!isNaN(monto) && monto > 0 && monto <= saldo) {
+                saldo -= monto;
+                actualizarSaldo();
+                document.getElementById('monto').value = '';
+            } else {
+                alert("Monto inválido o insuficiente saldo.");
+            }
+        }
+
+        actualizarSaldo();
+    </script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"> </script>
+</html>
+  
