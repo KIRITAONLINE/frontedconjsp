@@ -1,0 +1,46 @@
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    public User register(User user) {
+        user.setBalance(0.0);
+        return userRepository.save(user);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public void deposit(User user, Double amount) {
+        user.setBalance(user.getBalance() + amount);
+        userRepository.save(user);
+        Transaction transaction = new Transaction();
+        transaction.setUser(user);
+        transaction.setAmount(amount);
+        transaction.setType("deposit");
+        transaction.setDate(LocalDateTime.now());
+        transactionRepository.save(transaction);
+    }
+
+    public void withdraw(User user, Double amount) {
+        if (user.getBalance() >= amount) {
+            user.setBalance(user.getBalance() - amount);
+            userRepository.save(user);
+            Transaction transaction = new Transaction();
+            transaction.setUser(user);
+            transaction.setAmount(amount);
+            transaction.setType("withdrawal");
+            transaction.setDate(LocalDateTime.now());
+            transactionRepository.save(transaction);
+        } else {
+            throw new RuntimeException("Insufficient funds");
+        }
+    }
+
+    public List<Transaction> getTransactionHistory(User user) {
+        return transactionRepository.findByUser(user);
+    }
+}
