@@ -1,0 +1,31 @@
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) {
+        return ResponseEntity.ok(userService.register(user));
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<?> deposit(@RequestParam String username, @RequestParam Double amount) {
+        User user = userService.findByUsername(username);
+        userService.deposit(user, amount);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@RequestParam String username, @RequestParam Double amount) {
+        User user = userService.findByUsername(username);
+        userService.withdraw(user, amount);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<List<Transaction>> getTransactions(@RequestParam String username) {
+        User user = userService.findByUsername(username);
+        return ResponseEntity.ok(userService.getTransactionHistory(user));
+    }
+}
