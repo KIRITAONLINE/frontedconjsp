@@ -1,0 +1,75 @@
+//Cifrar datos en el frontend usar la API Web Crypto de JavaScript
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Encrypt Data Example</title>
+    <script>
+        async function encryptData(plainText, publicKey) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(plainText);
+            const encryptedData = await window.crypto.subtle.encrypt(
+                {
+                    name: "RSA-OAEP"
+                },
+                publicKey,
+                data
+            );
+            return encryptedData;
+        }
+
+        async function getPublicKey() {
+            // Public key in PEM format, this should be retrieved from your server
+            const publicKeyPem = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo7LS+gJ+7ZcvHVNMy3qo
+...
+0AvXhDJgoN+q4ycjZnwIDAQAB
+-----END PUBLIC KEY-----`;
+
+            // Convert PEM to ArrayBuffer
+            const binaryDerString = window.atob(publicKeyPem.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, ''));
+            const binaryDer = new Uint8Array(binaryDerString.length);
+            for (let i = 0; i < binaryDerString.length; i++) {
+                binaryDer[i] = binaryDerString.charCodeAt(i);
+            }
+
+            // Import the public key
+            const key = await window.crypto.subtle.importKey(
+                "spki",
+                binaryDer.buffer,
+                {
+                    name: "RSA-OAEP",
+                    hash: "SHA-256"
+                },
+                true,
+                ["encrypt"]
+            );
+            return key;
+        }
+
+        async function handleEncrypt() {
+            const publicKey = await getPublicKey();
+            const plainText = document.getElementById("data").value;
+            const encryptedData = await encryptData(plainText, publicKey);
+
+            // Convert encrypted data to base64 for easier transmission
+            const base64EncryptedData = btoa(String.fromCharCode(...new Uint8Array(encryptedData)));
+            console.log("Encrypted Data:", base64EncryptedData);
+
+            // Send encrypted data to the server
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ data: base64EncryptedData })
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Encrypt Data Example</h1>
+    <input type="text" id="data" placeholder="Enter data to encrypt">
+    <button onclick="handleEncrypt()">Encrypt and Send</button>
+</body>
+</html>
