@@ -1,0 +1,46 @@
+//controlador envia y recibir datos
+
+import org.bouncycastle.util.encoders.Base64;
+import org.springframework.web.bind.annotation.*;
+import javax.crypto.Cipher;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
+
+@RestController
+public class EncryptController {
+
+    private PrivateKey privateKey; // Your private key, ensure to load it securely
+
+    public EncryptController() {
+        // Load your private key here
+        // For demonstration purposes, we will generate a key pair
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            this.privateKey = keyPair.getPrivate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/submit")
+    public String receiveEncryptedData(@RequestBody Map<String, String> payload) {
+        try {
+            String encryptedData = payload.get("data");
+            byte[] decodedData = Base64.decode(encryptedData);
+
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            byte[] decryptedData = cipher.doFinal(decodedData);
+
+            String decryptedText = new String(decryptedData);
+            System.out.println("Decrypted Data: " + decryptedText);
+
+            return "Data received and decrypted successfully.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error decrypting data.";
+        }
+    }
+}
